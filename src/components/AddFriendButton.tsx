@@ -6,7 +6,6 @@ import axios, { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod'
-import Email from 'next-auth/providers/email';
 
 interface AddFriendButtonProps {}
 type FormData = z.infer <typeof addFriendValidator>

@@ -8,7 +8,7 @@ import React, { FC } from 'react'
 const page = async ({}) => {
   const session = await getServerSession(authOptions)
 
-  return <div>ffff</div>
+  return <div>Dashboard</div>
 }
 
 export default page;

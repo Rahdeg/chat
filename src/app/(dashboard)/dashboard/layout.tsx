@@ -1,6 +1,10 @@
+import FriendRequestSidebarOption from '@/components/FriendRequestSidebarOption'
 import { Icon, Icons } from '@/components/Icons'
+import SignOutButton from '@/components/SignOutButton'
+import { fetchRedis } from '@/helpers/redis'
 import { authOptions } from '@/lib/auth'
 import { getServerSession } from 'next-auth'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React, { FC, ReactNode } from 'react'
@@ -23,18 +27,7 @@ const sidebarOption:SidebarOption[]=[
     href:"/dashboard/add",
     Icon:"UserPlus"
   },
-  {
-    id:2,
-    name:"Add friend",
-    href:"/dashboard/add",
-    Icon:"UserPlus"
-  },
-  {
-    id:3,
-    name:"Add friend",
-    href:"/dashboard/add",
-    Icon:"UserPlus"
-  }
+  
 ]
 
 const layout = async ({children }:layoutProps) => {
@@ -42,6 +35,8 @@ const layout = async ({children }:layoutProps) => {
     if (!session) {
         notFound()
     }
+
+    const unseenRequestCount = (await fetchRedis('smembers',`user:${session.user.id}:incoming_friend_requests`) as User[]).length
 
 
   return (
@@ -80,7 +75,25 @@ const layout = async ({children }:layoutProps) => {
           })}
         </ul>
         </li>
-        <li></li>
+
+          <li className='flex'>
+            <FriendRequestSidebarOption sessionId={session.user.id} initialUnseenRequestCount={unseenRequestCount}/>
+          </li>
+
+        <li className='-mx-6 mt-auto flex items-center'>
+          <div className='flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900'>
+            <div className='relative h-8 w-8 bg-gray-50'>
+              <Image fill referrerPolicy='no-referrer' className='rounded-full' src={session.user.image || ''} alt='Your profile picture' />
+            </div>
+            <span className=' sr-only'>Your profile</span>
+            <div className='flex flex-col'>
+            <span aria-hidden="true">{session.user.name}</span>
+            <span className='text-xs text-zinc-400' aria-hidden="true">{session.user.email}
+            </span>
+            </div>
+          </div>
+          <SignOutButton className=""/>
+        </li>
       </ul>
     </nav>
     </div>

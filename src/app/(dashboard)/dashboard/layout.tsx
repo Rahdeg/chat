@@ -1,6 +1,8 @@
 import FriendRequestSidebarOption from '@/components/FriendRequestSidebarOption'
 import { Icon, Icons } from '@/components/Icons'
+import SibeBarChatList from '@/components/SibeBarChatList'
 import SignOutButton from '@/components/SignOutButton'
+import { getFriendsByUserId } from '@/helpers/get-friends-by-user-id'
 import { fetchRedis } from '@/helpers/redis'
 import { authOptions } from '@/lib/auth'
 import { getServerSession } from 'next-auth'
@@ -36,6 +38,11 @@ const layout = async ({children }:layoutProps) => {
         notFound()
     }
 
+    const friends = await getFriendsByUserId(session.user.id)
+
+    
+
+
     const unseenRequestCount = (await fetchRedis('smembers',`user:${session.user.id}:incoming_friend_requests`) as User[]).length
 
 
@@ -45,13 +52,17 @@ const layout = async ({children }:layoutProps) => {
     <Link href='/dashboard' className='flex h-16  shrink-0 items-center'>
         <Icons.Logo className='h-8 w-auto text-indigo-600'/>
     </Link>
-    <div className='text-xs font-semibold leading-6 text-gray-400'>
+    {
+      friends.length > 0 ? (
+        <div className='text-xs font-semibold leading-6 text-gray-400'>
     Your chat  
     </div>
+      ) : null
+    }
     <nav className=' flex flex-1 flex-col'>
       <ul role='list' className='flex flex-1 flex-col gap-y-7'>
         <li>
-          //chats that this user has
+         <SibeBarChatList friends={friends} sessionId={session.user.id}/>
         </li>
         <li>
           <div className='text-xs font-semibold leading-6 text-gray-400'>
@@ -73,12 +84,13 @@ const layout = async ({children }:layoutProps) => {
               </li>
             )
           })}
-        </ul>
-        </li>
-
           <li className='flex'>
             <FriendRequestSidebarOption sessionId={session.user.id} initialUnseenRequestCount={unseenRequestCount}/>
           </li>
+        </ul>
+        </li>
+
+          
 
         <li className='-mx-6 mt-auto flex items-center'>
           <div className='flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900'>

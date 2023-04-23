@@ -1,17 +1,25 @@
 "use client"
-import { cn } from '@/lib/utils'
+import { pusherClient } from '@/lib/pusher'
+import { cn, toPusherKey } from '@/lib/utils'
 import { Message } from '@/lib/validations/message'
 import { format } from 'date-fns'
-import React, { FC, useRef, useState } from 'react'
+import Image from 'next/image'
+import React, { FC, useEffect, useRef, useState } from 'react'
 
 interface MessagesProps {
     initialMessages:Message[]
     sessionId:string
+    sessionImg:string | null | undefined,
+    chatPartner:User
+    chatId:string
 }
 
 const Messages: FC<MessagesProps> = ({ 
     initialMessages,
-    sessionId
+    sessionId,
+    sessionImg,
+    chatPartner,
+    chatId,
  }) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages)
 
@@ -21,6 +29,20 @@ const Messages: FC<MessagesProps> = ({
 
 
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+        pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
+        
+        const messageHandler =(message : Message)=>{
+            setMessages((prev)=> [message, ...prev])
+        }
+        pusherClient.bind('incoming-messages', messageHandler)
+        return ()=>{
+          pusherClient.unsubscribe(toPusherKey(`chat:${chatId}`))
+          pusherClient.unbind('incoming-messages', messageHandler)
+        }
+      }, [])
+
   return <div className='flex h-full flex-1 flex-col-reverse gap-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch' id='messages'>
 <div ref={scrollDownRef}/> 
     {
@@ -41,6 +63,9 @@ const Messages: FC<MessagesProps> = ({
                                 {formatTimestamp(message.timestamp)}
                             </span>
                         </span>
+                    </div>
+                    <div className={cn('relative w-6 h-6',{'order-2': isCurrentUser,'order-1':!isCurrentUser, 'invisible': hasNextMessageFromSameUser})}> 
+                    <Image fill src={ isCurrentUser ? (sessionImg as string) : chatPartner.image} alt='profile pics' referrerPolicy='no-referrer' className='rounded-full'/>
                     </div>
                 </div>
             </div>

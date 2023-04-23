@@ -1,4 +1,3 @@
-import Button from '@/components/ux/Button';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 import React, { FC } from 'react'

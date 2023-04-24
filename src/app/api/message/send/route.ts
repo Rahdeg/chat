@@ -46,6 +46,13 @@ export async function POST(req:Request){
 
         //notify chat room
         pusherServer.trigger(toPusherKey(`chat:${chatId}`),'incoming-messages', message)
+        pusherServer.trigger(toPusherKey(`user:${friendId}:chat`),'new_message', {
+            ...message,
+            senderImg: sender.image,
+            senderName: sender.name
+        })
+
+        // pusherServer.trigger(toPusherKey(`user:${friendId}:friends`),'new_friend')
 
         await db.zadd(`chat:${chatId}:messages`,{
             score:timestamp,

@@ -28,7 +28,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({ incomingFriendRequests,sessio
         pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`))
         pusherClient.unbind('incoming_friend_requests', friendRequestHandler)
       }
-    }, [])
+    }, [sessionId])
     
 
     const router = useRouter()

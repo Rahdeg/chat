@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 
 interface pageProps {}
 
-const page: FC<pageProps> = ({  }) => {
+const Page: FC<pageProps> = ({  }) => {
 // eslint-disable-next-line react-hooks/rules-of-hooks
 const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -72,4 +72,4 @@ const loginWithGoogle = async ()=>{
   </>
 }
 
-export default page;
+export default Page;

@@ -1,8 +1,9 @@
 import AddFriendButton from '@/components/AddFriendButton';
+import { FC } from 'react';
 
 
 
-const page = ({  }) => {
+const page: FC = ({  }) => {
 
   return (
     <main className='pt-8'>
